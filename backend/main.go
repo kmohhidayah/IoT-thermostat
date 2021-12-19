@@ -14,7 +14,6 @@ func GetDataFromBroker() {
 	opts := broker.ConfigMqtt("broker.hivemq.com", 1883, "emqx_test_client")
 	// init new client
 	broker.InitNewClient(opts)
-	// subscribe a topic from TEMPERATURE channel
 
 }
 

@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-const ENDPOINT_SUBSCRIBER = "http://localhost:9090";
+const ENDPOINT_SUBSCRIBER = "http://localhost:9090/sensor";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -44,7 +44,7 @@ const MaxTemperature = () => {
     <div
       style={{
         padding: 10,
-        borde: "solid 2px #ddd",
+        border: "solid 2px #ddd",
         borderRadius: "5px",
         background: "#fff",
       }}

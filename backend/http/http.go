@@ -6,10 +6,16 @@ import (
 	"net/http"
 )
 
-func HttpServer() {
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Add("Content-Type", "application/json")
 		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		next.ServeHTTP(rw, r)
+	})
+}
+func HttpServer() {
+	router := http.NewServeMux()
+	router.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(struct {
 			Latest       broker.Temperature   `json:"latest"`
 			Temperatures []broker.Temperature `json:"temperatures"`
@@ -18,25 +24,19 @@ func HttpServer() {
 			Temperatures: broker.Temps,
 		})
 	})
-	http.HandleFunc("/latest", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Header().Add("Access-Control-Allow-Origin", "*")
+	router.HandleFunc("/latest", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.LatestTemperature{
 			LatestTemp: broker.Temp.Temp,
 			LatestTime: broker.Temp.Timestamp,
 		})
 	})
 
-	http.HandleFunc("/max", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Header().Add("Access-Control-Allow-Origin", "*")
+	router.HandleFunc("/max", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.MaxTemperature{MaxTemp: FindMax()})
 	})
-	http.HandleFunc("/min", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Header().Add("Access-Control-Allow-Origin", "*")
+	router.HandleFunc("/min", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.MinTemperature{MinTemp: FindMin()})
 	})
-
-	http.ListenAndServe(":9090", nil)
+	routerWithMiddleware := CORSMiddleware(router)
+	http.ListenAndServe(":9090", routerWithMiddleware)
 }

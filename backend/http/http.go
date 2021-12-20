@@ -15,7 +15,7 @@ func CORSMiddleware(next http.Handler) http.Handler {
 }
 func HttpServer() {
 	router := http.NewServeMux()
-	router.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/sensor", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(struct {
 			Latest       broker.Temperature   `json:"latest"`
 			Temperatures []broker.Temperature `json:"temperatures"`
@@ -24,17 +24,17 @@ func HttpServer() {
 			Temperatures: broker.Temps,
 		})
 	})
-	router.HandleFunc("/latest", func(rw http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/sensor/latest", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.LatestTemperature{
 			LatestTemp: broker.Temp.Temp,
 			LatestTime: broker.Temp.Timestamp,
 		})
 	})
 
-	router.HandleFunc("/max", func(rw http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/sensor/max", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.MaxTemperature{MaxTemp: FindMax()})
 	})
-	router.HandleFunc("/min", func(rw http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/sensor/min", func(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(broker.MinTemperature{MinTemp: FindMin()})
 	})
 	routerWithMiddleware := CORSMiddleware(router)

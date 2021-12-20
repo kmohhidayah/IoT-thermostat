@@ -1,43 +1,88 @@
 import useSWR from "swr";
 
-const ENDPOINT_SUBSCRIBER = "http://localhost:4000";
+const ENDPOINT_SUBSCRIBER = "http://localhost:9090";
 
-const getData = async () => {
-  const response = await fetch(ENDPOINT_SUBSCRIBER);
-  return await response.json();
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+const LatestTemperature = () => {
+  const { data } = useSWR(`${ENDPOINT_SUBSCRIBER}/latest`, fetcher);
+  const latestTemp = data?.latesttemp || 0;
+  const latestTime = data?.latesttime || "";
+  return (
+    <div
+      style={{
+        padding: 10,
+        border: "solid 2px #ddd",
+        borderRadius: "5px",
+        background: "#fff",
+      }}
+    >
+      <div
+        style={{
+          color: parseInt(latestTemp, 10) > 30 ? "red" : "green",
+          fontSize: 60,
+          textAlign: "center",
+        }}
+      >
+        {`${parseInt(latestTemp, 10)} C`}
+      </div>
+      <div tyle={{ textAlign: "center", alignItems: "center" }}>
+        {latestTime}
+      </div>
+    </div>
+  );
+};
+
+const MaxTemperature = () => {
+  const { data } = useSWR(`${ENDPOINT_SUBSCRIBER}/max`, fetcher);
+  const maxTemp = data?.maxtemp || 0;
+  return (
+    <div
+      style={{
+        padding: 10,
+        borde: "solid 2px #ddd",
+        borderRadius: "5px",
+        background: "#fff",
+      }}
+    >
+      <div
+        style={{ color: "red", fontSize: 20, textAlign: "center" }}
+      >{`Max (${parseInt(maxTemp, 10)}C)`}</div>
+    </div>
+  );
+};
+
+const MinTemperature = () => {
+  const { data } = useSWR(`${ENDPOINT_SUBSCRIBER}/min`, fetcher);
+  const minTemp = data?.mintemp || 0;
+  return (
+    <div
+      style={{
+        padding: 10,
+        border: "solid 2px #ddd",
+        borderRadius: "5px",
+        background: "#fff",
+      }}
+    >
+      <div
+        style={{ color: "green", fontSize: 20, textAlign: "center" }}
+      >{`Min (${parseInt(minTemp, 10)}C)`}</div>
+    </div>
+  );
 };
 
 function App() {
-  const { data } = useSWR(ENDPOINT_SUBSCRIBER, getData);
-  const latestTemp = data?.latest;
+  const { data } = useSWR(ENDPOINT_SUBSCRIBER, fetcher);
   const temperatures = data?.temperatures;
-  console.log(temperatures);
-
   return (
     <div style={{ marginTop: 40 }}>
       <div style={{ width: 300, margin: "0 auto" }}>
-        {latestTemp && (
-          <div
-            style={{
-              padding: 10,
-              border: "solid 2px #ddd",
-              borderRadius: "5px",
-              background: "#fff",
-            }}
-          >
-            <div
-              style={{
-                color: parseInt(latestTemp.temp, 10) > 30 ? "red" : "green",
-                fontSize: 60,
-                textAlign: "center",
-              }}
-            >
-              {`${parseInt(latestTemp.temp, 10)} C`}
-            </div>
-            <div tyle={{ textAlign: "center" }}>{latestTemp.timestamp}</div>
-          </div>
-        )}
+        <h2>Latest</h2>
+        <LatestTemperature />
+        <MaxTemperature />
+        <MinTemperature />
         <div>
+          <h2>History</h2>
           {temperatures &&
             temperatures.map((temperature) => (
               <div

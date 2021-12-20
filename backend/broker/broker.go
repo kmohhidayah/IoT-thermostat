@@ -9,9 +9,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func ConfigMqtt(host string, port int, clientID string) *mqtt.ClientOptions {
-	brokerHost := fmt.Sprintf("tcp://%s:%d", host, port)
-	opts := mqtt.NewClientOptions().AddBroker(brokerHost).SetClientID(clientID)
+func ConfigMqtt(config string, clientID string) *mqtt.ClientOptions {
+	opts := mqtt.NewClientOptions().AddBroker(config).SetClientID(clientID)
 	opts.SetKeepAlive(5 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("%s\n", msg.Payload())

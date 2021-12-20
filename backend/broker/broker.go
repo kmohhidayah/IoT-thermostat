@@ -12,7 +12,7 @@ import (
 func ConfigMqtt(host string, port int, clientID string) *mqtt.ClientOptions {
 	brokerHost := fmt.Sprintf("tcp://%s:%d", host, port)
 	opts := mqtt.NewClientOptions().AddBroker(brokerHost).SetClientID(clientID)
-	opts.SetKeepAlive(60 * time.Second)
+	opts.SetKeepAlive(5 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		fmt.Printf("%s\n", msg.Payload())
 		json.Unmarshal(msg.Payload(), &Temp)

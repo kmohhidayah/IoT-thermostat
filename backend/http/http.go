@@ -18,5 +18,25 @@ func HttpServer() {
 			Temperatures: broker.Temps,
 		})
 	})
-	http.ListenAndServe(":4000", nil)
+	http.HandleFunc("/latest", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		json.NewEncoder(rw).Encode(broker.LatestTemperature{
+			LatestTemp: broker.Temp.Temp,
+			LatestTime: broker.Temp.Timestamp,
+		})
+	})
+
+	http.HandleFunc("/max", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		json.NewEncoder(rw).Encode(broker.MaxTemperature{MaxTemp: FindMax()})
+	})
+	http.HandleFunc("/min", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		json.NewEncoder(rw).Encode(broker.MinTemperature{MinTemp: FindMin()})
+	})
+
+	http.ListenAndServe(":9090", nil)
 }

@@ -21,6 +21,7 @@ python3 publish.py
 
 ```bash
 cd backend
+go get github.com/eclipse/paho.mqtt.golang
 go run main.go
 
 # copy file .env.example to .env
